@@ -4,6 +4,10 @@ pipeline {
 
   agent any
 
+  tools {
+    mvn "mvn3.8"
+  }
+
   stages {
     stage('Build') {
       steps {
