@@ -15,6 +15,18 @@ pipeline {
 	sh 'mvn clean package'
       }
     }
+    stage('SonarQube analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh "sonnar-scanner"
+                }
+            }
+        }
+    stage("Quality gate") {
+            steps {
+                waitForQualityGate abortPipeline: true
+            }
+        }	  
     stage('Create Container Image') {
       steps {
         echo 'Create Container Image..'
