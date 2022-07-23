@@ -20,7 +20,7 @@ pipeline {
         script {
 
           openshift.withCluster() { 
-  		openshift.withProject("<your_project_name>") {
+  		openshift.withProject("harishankarsahu") {
   
     		def buildConfigExists = openshift.selector("bc", "codelikethewind").exists() 
     
@@ -37,16 +37,21 @@ pipeline {
       steps {
         echo 'Deploying....'
         script {
-penshift.withCluster() { 
-  openshift.withProject("<your_project_name>") {
-  
-    def buildConfigExists = openshift.selector("bc", "codelikethewind").exists() 
+	openshift.withCluster() { 
+  	openshift.withProject("harishankarsahu") { 
+    def deployment = openshift.selector("dc", "codelikethewind") 
     
-    if(!buildConfigExists){ 
-      openshift.newBuild("--name=codelikethewind", "--docker-image=registry.redhat.io/jboss-eap-7/eap74-openjdk8-openshift-rhel7", "--binary") 
+    if(!deployment.exists()){ 
+      openshift.newApp('codelikethewind', "--as-deployment-config").narrow('svc').expose() 
     } 
     
-    openshift.selector("bc", "codelikethewind").startBuild("--from-file=target/simple-servlet-0.0.1-SNAPSHOT.war", "--follow") } }		
+    timeout(5) { 
+      openshift.selector("dc", "codelikethewind").related('pods').untilEach(1) { 
+        return (it.object().status.phase == "Running") 
+      } 
+    } 
+  } 
+}		
 
         }
       }
