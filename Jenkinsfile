@@ -27,7 +27,7 @@ pipeline {
     		def buildConfigExists = openshift.selector("bc", "codelikethewind").exists() 
     
   	 if(!buildConfigExists){ 
-      		openshift.newBuild("--name=codelikethewind", "--image=redhat-openjdk18-openshift:1.5", "--binary") 
+      		openshift.newBuild("--name=codelikethewind", "redhat-openjdk18-openshift:1.5", "--binary") 
     } 
     
     		openshift.selector("bc", "codelikethewind").startBuild("--from-file=target/simple-servlet-0.0.1-SNAPSHOT.war", "--follow") } }
